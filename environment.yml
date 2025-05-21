@@ -1,0 +1,24 @@
+name: DeepSeek-Lawyer
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.9
+  - pip
+  - cudatoolkit=12.1
+  - pip:
+      - torch==2.0.0+cu121
+      - torchvision==0.15.1+cu121
+      - torchaudio==2.0.1
+      - bitsandbytes-cuda121
+      - transformers
+      - accelerate
+      - datasets
+      - peft
+      - pyttsx3
+      - pandas
+      - numpy
+      - tqdm
+  - pip:
+      - https://download.pytorch.org/whl/cu121/torch-2.0.0%2Bcu121-cp39-cp39-win_amd64.whl

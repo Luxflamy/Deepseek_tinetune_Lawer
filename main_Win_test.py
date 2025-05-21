@@ -15,12 +15,12 @@ from pyexpat import model
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import BitsAndBytesConfig
-from peft import LoraConfig, TaskType, get_peft_model, PeftModel
+from peft import LoraConfig, TaskType, get_peft_model
 from transformers import TrainingArguments, Trainer
 
 
 MODEL_PATH = "deepseekr1-1.5b"
-DATA_DIR = Path("LegalQA-all_js_test")
+DATA_DIR = Path("LegalQA-all_js")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -44,16 +44,14 @@ def tokenize_function(examples):
         texts,
         padding="max_length",
         truncation=True,
-        max_length=256, # 512
+        max_length=512,
         return_tensors="pt"
     )
     tokenized["labels"] = tokenized["input_ids"].clone()
     return tokenized
 
-def main():
-    # 清空显存
-    torch.cuda.empty_cache()
 
+def main():
     global tokenizer
     torch.backends.cudnn.benchmark = True
     device = torch.device("cuda")
@@ -82,18 +80,12 @@ def main():
     print("\n -----------Tokenization处理完成!-----------")
 
     # 量化配置
-    quantization_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_compute_dtype=torch.float16  # 3060不支持bf16，使用fp16
-    )
-
+    quantization_config = BitsAndBytesConfig(load_in_8bit=True)
     model = AutoModelForCausalLM.from_pretrained(MODEL_PATH,quantization_config=quantization_config, device_map="auto")
     print("-----------量化加载成功-----------")
 
     # LoRA微调配置
-    lora_config = LoraConfig( r=16,lora_alpha=32,lora_dropout=0.05, task_type=TaskType.CAUSAL_LM, target_modules=["q_proj", "v_proj"])
+    lora_config = LoraConfig( r=8,lora_alpha=16,lora_dropout=0.05, task_type=TaskType.CAUSAL_LM)
 
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters() 
@@ -102,35 +94,26 @@ def main():
     # 设置训练参数
     training_args = TrainingArguments(
         output_dir="./finetunedmodels/output",
-        num_train_epochs=3, 
-        per_device_train_batch_size=4,
-        gradient_accumulation_steps=4,
-
-        # gradient_checkpointing=True,  # 必须启用以节省显存
-        optim="adamw_torch_fused",
-        warmup_ratio=0.1,
-        lr_scheduler_type="cosine",
-        remove_unused_columns=True,  # 确保已启用
-        dataloader_prefetch_factor=4,  # 增加预取
-
-
+        num_train_epochs=3,
+        per_device_train_batch_size=2,
+        gradient_accumulation_steps=16,
         bf16=False,
         fp16=True,  # CUDA上使用fp16
-        logging_steps=50,
+        logging_steps=100,
         save_strategy="epoch",  
         # save_steps=500,
         eval_strategy="epoch",
         # eval_steps=10,
-        learning_rate=3e-5,
+        learning_rate=4e-5,
         logging_dir="./logs",
         run_name="deepseekr1-1.5bFinetune",
         report_to="none",  # 不使用wandb
         dataloader_pin_memory=True,
         dataloader_num_workers=4,  # 使用多线程加载数据
         load_best_model_at_end=True,
-        metric_for_best_model="eval_loss",  # 替换为你的评估指标
+        metric_for_best_model="Best Model",  # 替换为你的评估指标
     )
-    print("-----------训练参数设置成功,开始训练-----------")
+    print("-----------训练参数设置成功-----------")
 
     # 初始化 Trainer
     trainer = Trainer(
@@ -139,29 +122,22 @@ def main():
         train_dataset=tokenized_train,
         eval_dataset=tokenized_valid
     )
+    print("-----------训练器设置成功，开始训练-----------")
 
     # 执行训练
     trainer.train()
     print("-----------训练完成-----------")
 
-    # 保存lora微调的模型和 tokenizer
-    save_path = "./finetunedmodels/deepseekr1-1.5b"
-    model.save_pretrained(save_path)
-    tokenizer.save_pretrained(save_path)
-    print("-----------lora保存成功-----------")
+    # 保存模型和 tokenizer
+    model.save_pretrained("./finetunedmodels/deepseekr1-1.5b")
+    tokenizer.save_pretrained("./finetunedmodels/deepseekr1-1.5b")
+    print("-----------模型保存成功-----------")
 
-    # 保存全模型
-    base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, device_map="auto", torch_dtype=torch.float16,trust_remote_code=True)
-    model = PeftModel.from_pretrained(base_model, save_path)
-    model = model.merge_and_unload()
 
-    final_save_path = "./finetunedmodels/deepseekr1-1.5b_full"
-    model.save_pretrained(final_save_path)
-    tokenizer.save_pretrained(final_save_path)
-    print("-----------全模型保存成功-----------")
+    
     
 if __name__ == "__main__":
-    # 异常处理
+    # 添加异常处理
     try:
         tokenized_data = main()
     except Exception as e:
