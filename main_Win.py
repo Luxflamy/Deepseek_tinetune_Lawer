@@ -151,7 +151,8 @@ def main():
     print("-----------lora保存成功-----------")
 
     # 保存全模型
-    base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, device_map="auto", torch_dtype=torch.float16,trust_remote_code=True)
+    base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, device_map="auto")
+    #base_model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
     model = PeftModel.from_pretrained(base_model, save_path)
     model = model.merge_and_unload()
 

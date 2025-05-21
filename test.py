@@ -1,11 +1,5 @@
-from transformers import TrainingArguments
-
-args = TrainingArguments(
-    output_dir="./output",
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
-    num_train_epochs=1,
-    per_device_train_batch_size=1
-)
-
-print(args)
+import sys
+print("Default encoding:", sys.getdefaultencoding())
+print("stdin encoding:", sys.stdin.encoding)
+print("stdout encoding:", sys.stdout.encoding)
+print("stderr encoding:", sys.stderr.encoding)

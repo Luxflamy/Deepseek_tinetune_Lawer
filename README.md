@@ -108,3 +108,80 @@ python main.py
 
 本项目遵循 [MIT License](./LICENSE)。
 
+
+```
+Deepseek_tinetune_Lawer
+├─ .bash_profile
+├─ .idea
+│  ├─ Deepseek_tinetune_Lawer.iml
+│  ├─ inspectionProfiles
+│  │  └─ profiles_settings.xml
+│  ├─ misc.xml
+│  ├─ modules.xml
+│  ├─ vcs.xml
+│  └─ workspace.xml
+├─ data_prepare.py
+├─ Demo.py
+├─ environment.yml
+├─ finetunedmodels
+│  ├─ output
+│  │  ├─ checkpoint-126
+│  │  │  ├─ adapter_config.json
+│  │  │  ├─ adapter_model.safetensors
+│  │  │  ├─ optimizer.pt
+│  │  │  ├─ README.md
+│  │  │  ├─ rng_state.pth
+│  │  │  ├─ scaler.pt
+│  │  │  ├─ scheduler.pt
+│  │  │  ├─ trainer_state.json
+│  │  │  └─ training_args.bin
+│  │  ├─ checkpoint-189
+│  │  │  ├─ adapter_config.json
+│  │  │  ├─ adapter_model.safetensors
+│  │  │  ├─ optimizer.pt
+│  │  │  ├─ README.md
+│  │  │  ├─ rng_state.pth
+│  │  │  ├─ scaler.pt
+│  │  │  ├─ scheduler.pt
+│  │  │  ├─ trainer_state.json
+│  │  │  └─ training_args.bin
+│  │  └─ checkpoint-63
+│  │     ├─ adapter_config.json
+│  │     ├─ adapter_model.safetensors
+│  │     ├─ optimizer.pt
+│  │     ├─ README.md
+│  │     ├─ rng_state.pth
+│  │     ├─ scaler.pt
+│  │     ├─ scheduler.pt
+│  │     ├─ trainer_state.json
+│  │     └─ training_args.bin
+│  └─ output_cpu
+├─ LegalQA-all
+│  ├─ LegalQA-all-dev.csv
+│  ├─ LegalQA-all-test.csv
+│  └─ LegalQA-all-train.csv
+├─ LegalQA-all.zip
+├─ LegalQA-all_js
+│  ├─ LegalQA-all_js_test
+│  ├─ legal_qa_dev_formatted.json
+│  ├─ legal_qa_test_formatted.json
+│  └─ legal_qa_train_formatted.json
+├─ LegalQA-all_js_test
+│  ├─ legal_qa_dev_formatted.json
+│  ├─ legal_qa_test_formatted.json
+│  └─ legal_qa_train_formatted.json
+├─ LICENSE
+├─ main.py
+├─ main_test.py
+├─ main_Win.py
+├─ main_Win_test.py
+├─ mian_Win_Standard.py
+├─ packages_to_remove.txt
+├─ process_legal_data.py
+├─ process_legal_data_test.py
+├─ README copy.MD
+├─ README.md
+├─ requirements.txt
+└─ test.py
+
+```
